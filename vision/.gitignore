@@ -4,5 +4,6 @@ __pycache__/
 *.pkl
 *.csv
 *.yml
-vision/embeddings/
 vision/dataset/
+vision/embeddings/
+dataset/
