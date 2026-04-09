@@ -1,0 +1,8 @@
+.env
+venv/
+__pycache__/
+*.pkl
+*.csv
+*.yml
+vision/embeddings/
+vision/dataset/

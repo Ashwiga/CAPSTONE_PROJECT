@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Bus Monitoring System</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family: "Segoe UI", sans-serif;
+    background:#0d0d0d;
+    color:white;
+    transition:0.4s;
+}
+
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 30px;
+    border-bottom:2px solid red;
+}
+
+.header h1{
+    color:red;
+}
+
+.toggle-btn{
+    background:red;
+    border:none;
+    padding:8px 15px;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+    transition:0.3s;
+}
+.toggle-btn:hover{
+    transform:scale(1.1);
+}
+
+/* MAIN CONTAINER */
+.container{
+    padding:30px;
+}
+
+.row{
+    display:flex;
+    gap:25px;
+}
+
+/* CARDS */
+.card{
+    background:#1a1a1a;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(255,0,0,0.1);
+    flex:1;
+    transition:0.3s;
+}
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card h2{
+    border-bottom:2px solid red;
+    padding-bottom:10px;
+    margin-bottom:15px;
+}
+
+/* CAMERA LAYOUT */
+.camera-layout{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:30px;
+}
+
+.controls{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+/* BUTTONS */
+.btn{
+    padding:8px 16px;
+    border-radius:6px;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.3s;
+}
+.btn:hover{
+    transform:scale(1.1);
+}
+.btn:active{
+    transform:scale(0.95);
+}
+
+.start{ background:green; color:white; }
+.stop{ background:red; color:white; }
+
+/* CAMERA */
+.camera-center{
+    flex:1;
+    display:flex;
+    justify-content:center;
+}
+
+.camera-center img{
+    width:80%;
+    border-radius:12px;
+    box-shadow:0 0 25px rgba(255,0,0,0.3);
+}
+
+/* LIVE DOT */
+.live-dot{
+    display:inline-block;
+    width:12px;
+    height:12px;
+    margin-left:10px;
+    border-radius:50%;
+    background:red;
+    box-shadow:0 0 10px red;
+    animation:pulse 1.2s infinite;
+    visibility:hidden;
+}
+@keyframes pulse{
+    0%{box-shadow:0 0 5px red;}
+    50%{box-shadow:0 0 20px red;}
+    100%{box-shadow:0 0 5px red;}
+}
+
+/* SPINNER */
+.spinner{
+    border:4px solid #333;
+    border-top:4px solid red;
+    border-radius:50%;
+    width:35px;
+    height:35px;
+    animation:spin 1s linear infinite;
+    display:none;
+}
+@keyframes spin{
+    0%{transform:rotate(0deg);}
+    100%{transform:rotate(360deg);}
+}
+
+/* STATUS */
+.status-green{ color:#00ff66; font-weight:bold; }
+.status-red{ color:#ff4444; font-weight:bold; }
+
+/* TABLE */
+.table-card{
+    margin-top:30px;
+    background:#1a1a1a;
+    padding:20px;
+    border-radius:12px;
+}
+.table-card h2{
+    border-bottom:2px solid red;
+    padding-bottom:10px;
+    margin-bottom:15px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+thead{
+    background:#c41717;
+}
+th,td{
+    padding:10px;
+    text-align:center;
+}
+tr:nth-child(even){
+    background:#111;
+}
+
+.board{ color:#00ff66; font-weight:bold; }
+.deboard{ color:#ff4444; font-weight:bold; }
+
+/* TOAST */
+.toast{
+    position:fixed;
+    bottom:30px;
+    right:30px;
+    background:#00c853;
+    padding:15px 25px;
+    border-radius:8px;
+    animation:slideIn 0.4s ease, fadeOut 0.4s ease 3s forwards;
+}
+@keyframes slideIn{
+    from{transform:translateX(100px);opacity:0;}
+    to{transform:translateX(0);opacity:1;}
+}
+@keyframes fadeOut{
+    to{opacity:0;transform:translateX(100px);}
+}
+
+/* LIGHT MODE */
+.light-mode{
+    background:linear-gradient(135deg,#e3f2fd,#f1f8ff);
+    color:#1a1a1a;
+}
+.light-mode .header{
+    border-bottom:3px solid #0097a7;
+}
+.light-mode .header h1{
+    color:#0097a7;
+}
+.light-mode .toggle-btn{
+    background:#0097a7;
+}
+.light-mode .card,
+.light-mode .table-card{
+    background:white;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+.light-mode thead{
+    background:#0097a7;
+}
+.light-mode tr:nth-child(even){
+    background:#f5fafd;
+}
+</style>
+</head>
+
+
+<body>
+
+<div class="header">
+    <h1>🚌 Smart Bus Monitoring System</h1>
+    <button class="toggle-btn" onclick="toggleMode()">Dark / Light</button>
+</div>
+
+<div class="container">
+
+<div class="row">
+
+<!-- CAMERA CARD -->
+<div class="card">
+    <h2>
+        Live Camera
+        <span id="liveIndicator" class="live-dot"></span>
+    </h2>
+
+    <div class="camera-layout">
+
+        <!-- LEFT CONTROLS -->
+        <div class="controls">
+            <button class="btn start" onclick="startCamera()">Start</button>
+            <button class="btn stop" onclick="stopCamera()">Stop</button>
+            <div id="loadingSpinner" class="spinner"></div>
+        </div>
+
+        <!-- CENTER CAMERA -->
+        <div class="camera-center">
+            <img src="/video_feed">
+        </div>
+
+    </div>
+</div>
+
+<!-- STATUS CARD -->
+<div class="card">
+    <h2>System Status</h2>
+    <p>Camera: <span id="cameraStatus"></span></p>
+    <p>Database: <span id="dbStatus"></span></p>
+    <p>Last Detection: <span id="lastDetection"></span></p>
+</div>
+
+</div>
+
+<!-- TABLE -->
+<div class="table-card">
+    <h2>Student Activity</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Event</th>
+            </tr>
+        </thead>
+        <tbody id="logTable"></tbody>
+    </table>
+</div>
+
+</div>
+
+<script>
+
+let lastEventCount = 0;
+
+function toggleMode(){
+    document.body.classList.toggle("light-mode");
+}
+
+function startCamera(){
+    document.getElementById("loadingSpinner").style.display="block";
+    fetch("/start_camera")
+    .then(()=>{
+        setTimeout(()=>{
+            document.getElementById("loadingSpinner").style.display="none";
+            document.getElementById("liveIndicator").style.visibility="visible";
+        },1200);
+    });
+}
+
+function stopCamera(){
+    fetch("/stop_camera")
+    .then(()=>{
+        document.getElementById("liveIndicator").style.visibility="hidden";
+    });
+}
+
+function showToast(message){
+    const toast=document.createElement("div");
+    toast.className="toast";
+    toast.innerText=message;
+    document.body.appendChild(toast);
+    setTimeout(()=>{toast.remove();},3500);
+}
+
+function loadLogs(){
+    fetch("/logs")
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.length>lastEventCount){
+            const latest=data[0];
+            if(latest.event==="Board"){
+                showToast("🟢 "+latest.name+" boarded the bus");
+            }
+            lastEventCount=data.length;
+        }
+
+        let rows="";
+        data.forEach(log=>{
+            let cls=log.event==="Board"?"board":"deboard";
+            rows+=`
+                <tr>
+                    <td>${log.name}</td>
+                    <td>${log.date}</td>
+                    <td>${log.time}</td>
+                    <td class="${cls}">${log.event}</td>
+                </tr>
+            `;
+        });
+        document.getElementById("logTable").innerHTML=rows;
+    });
+}
+
+function loadStatus(){
+    fetch("/system_status")
+    .then(res=>res.json())
+    .then(data=>{
+        let cam=document.getElementById("cameraStatus");
+        cam.innerText=data.camera;
+        cam.className=data.camera==="Active"?"status-green":"status-red";
+        document.getElementById("dbStatus").innerText=data.database;
+        document.getElementById("lastDetection").innerText=data.last_detection;
+    });
+}
+
+setInterval(()=>{
+    loadLogs();
+    loadStatus();
+},2000);
+
+</script>
+<script>
+
+function sendLocation() {
+
+    if (navigator.geolocation) {
+
+        navigator.geolocation.getCurrentPosition(
+
+            function(position){
+
+                let lat = position.coords.latitude;
+                let lon = position.coords.longitude;
+
+                fetch("/update_location",{
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify({
+                        latitude:lat,
+                        longitude:lon
+                    })
+                });
+
+            },
+
+            function(error){
+                console.log("Location error:",error);
+            },
+
+            {
+                enableHighAccuracy:true,
+                maximumAge:0,
+                timeout:5000
+            }
+
+        );
+
+    } else {
+
+        console.log("Geolocation not supported");
+
+    }
+
+}
+
+// send location every 3 seconds
+setInterval(sendLocation,3000);
+
+</script>
+</body>
+</html>
