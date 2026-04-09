@@ -44,6 +44,9 @@ TWILIO_SID = os.getenv("TWILIO_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_PHONE = os.getenv("TWILIO_PHONE")
 
+print("TWILIO SID:", TWILIO_SID)
+print("TWILIO PHONE:", TWILIO_PHONE)
+
 
 twilio_client = Client(TWILIO_SID, TWILIO_AUTH_TOKEN)
 
@@ -210,16 +213,18 @@ def send_sms(to_number, message):
 
     try:
 
-        twilio_client.messages.create(
+        print("Sending SMS to:", to_number)
+
+        msg = twilio_client.messages.create(
             body=message,
             from_=TWILIO_PHONE,
             to=to_number
         )
 
-        print("SMS sent to", to_number)
+        print("SMS SID:", msg.sid)
+        print("SMS sent successfully")
 
     except Exception as e:
-
         print("SMS failed:", e)
 
 
